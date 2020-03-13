@@ -58,45 +58,6 @@ exports.postOnNewIssue = functions.crashlytics.issue().onNew(async (issue) => {
 });
 // [END on_new_issue]
 
-exports.postOnRegressedIssue = functions.crashlytics.issue().onRegressed(async (issue) => {
-  const issueId = issue.issueId;
-  const issueTitle = issue.issueTitle;
-  const appName = issue.appInfo.appName;
-  const appPlatform = issue.appInfo.appPlatform;
-  const latestAppVersion = issue.appInfo.latestAppVersion;
-  const resolvedTime = issue.resolvedTime;
-
-  const messageBody = {
-    "username": "Firebase Crashlytics", // This will appear as user name who posts the message
-    "text": `この問題は ${new Date(resolvedTime).toString()} に解決されました`,
-    "icon_emoji": ":firebase:", // User icon, you can also use custom icons here
-    "attachments": [{ // this defines the attachment block, allows for better layout usage
-      "color": "#016e15", // color of the attachments sidebar.
-      "fields": [ // actual fields
-        {
-          "title": "Issue Title", // Custom field
-          "text": issueTitle
-        },
-        {
-          "title": "Issue Number",
-          "text": issueId
-        },
-        {
-          "title": "App Name",
-          "text": appName
-        },
-        {
-          "title": "App Version",
-          "text": `${latestAppVersion} on ${appPlatform}`
-        }
-      ]
-    }]
-  };
-
-  await notifySlack(messageBody);
-  console.log(`Posted regressed issue ${issueId} successfully to Slack`);
-});
-
 exports.postOnVelocityAlert = functions.crashlytics.issue().onVelocityAlert(async (issue) => {
   const issueId = issue.issueId;
   const issueTitle = issue.issueTitle;
