@@ -1,18 +1,3 @@
-/**
- * Copyright 2017 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 'use strict';
 
 const functions = require('firebase-functions');
@@ -40,10 +25,35 @@ exports.postOnNewIssue = functions.crashlytics.issue().onNew(async (issue) => {
   const appPlatform = issue.appInfo.appPlatform;
   const latestAppVersion = issue.appInfo.latestAppVersion;
 
-  const slackMessage = `<!here|here> There is a new issue - ${issueTitle} (${issueId}) ` +
-      `in ${appName}, version ${latestAppVersion} on ${appPlatform}`;
 
-  await notifySlack(slackMessage);
+  const messageBody = {
+    "username": "Firebase Crashlytics", // This will appear as user name who posts the message
+    "text": "新しい問題が発生しました",
+    "icon_emoji": ":firebase:", // User icon, you can also use custom icons here
+    "attachments": [{ // this defines the attachment block, allows for better layout usage
+      "color": "#ff8c00", // color of the attachments sidebar.
+      "fields": [ // actual fields
+        {
+          "title": "Issue Title", // Custom field
+          "text": issueTitle
+        },
+        {
+          "title": "Issue Number",
+          "text": issueId
+        },
+        {
+          "title": "App Name",
+          "text": appName
+        },
+        {
+          "title": "App Version",
+          "text": `${latestAppVersion} on ${appPlatform}`
+        }
+      ]
+    }]
+  };
+
+  await notifySlack(messageBody);
   console.log(`Posted new issue ${issueId} successfully to Slack`);
 });
 // [END on_new_issue]
@@ -56,11 +66,34 @@ exports.postOnRegressedIssue = functions.crashlytics.issue().onRegressed(async (
   const latestAppVersion = issue.appInfo.latestAppVersion;
   const resolvedTime = issue.resolvedTime;
 
-  const slackMessage = `<!here|here> There is a regressed issue ${issueTitle} (${issueId}) ` +
-      `in ${appName}, version ${latestAppVersion} on ${appPlatform}. This issue was previously ` +
-      `resolved at ${new Date(resolvedTime).toString()}`;
+  const messageBody = {
+    "username": "Firebase Crashlytics", // This will appear as user name who posts the message
+    "text": `この問題は ${new Date(resolvedTime).toString()} に解決されました`,
+    "icon_emoji": ":firebase:", // User icon, you can also use custom icons here
+    "attachments": [{ // this defines the attachment block, allows for better layout usage
+      "color": "#016e15", // color of the attachments sidebar.
+      "fields": [ // actual fields
+        {
+          "title": "Issue Title", // Custom field
+          "text": issueTitle
+        },
+        {
+          "title": "Issue Number",
+          "text": issueId
+        },
+        {
+          "title": "App Name",
+          "text": appName
+        },
+        {
+          "title": "App Version",
+          "text": `${latestAppVersion} on ${appPlatform}`
+        }
+      ]
+    }]
+  };
 
-  await notifySlack(slackMessage);
+  await notifySlack(messageBody);
   console.log(`Posted regressed issue ${issueId} successfully to Slack`);
 });
 
@@ -72,10 +105,33 @@ exports.postOnVelocityAlert = functions.crashlytics.issue().onVelocityAlert(asyn
   const latestAppVersion = issue.appInfo.latestAppVersion;
   const crashPercentage = issue.velocityAlert.crashPercentage;
 
-  const slackMessage = `<!here|here> There is an issue ${issueTitle} (${issueId}) ` +
-      `in ${appName}, version ${latestAppVersion} on ${appPlatform} that is causing ` +
-      `${parseFloat(crashPercentage).toFixed(2)}% of all sessions to crash.`;
+  const messageBody = {
+    "username": "Firebase Crashlytics", // This will appear as user name who posts the message
+    "text": `この問題は ${parseFloat(crashPercentage).toFixed(2)} % のユーザーに発生しています`,
+    "icon_emoji": ":firebase:", // User icon, you can also use custom icons here
+    "attachments": [{ // this defines the attachment block, allows for better layout usage
+      "color": "#e2222e", // color of the attachments sidebar.
+      "fields": [ // actual fields
+        {
+          "title": "Issue Title", // Custom field
+          "text": issueTitle
+        },
+        {
+          "title": "Issue Number",
+          "text": issueId
+        },
+        {
+          "title": "App Name",
+          "text": appName
+        },
+        {
+          "title": "App Version",
+          "text": `${latestAppVersion} on ${appPlatform}`
+        }
+      ]
+    }]
+  };
 
-  await notifySlack(slackMessage);
+  await notifySlack(messageBody);
   console.log(`Posted velocity alert ${issueId} successfully to Slack`);
 });
