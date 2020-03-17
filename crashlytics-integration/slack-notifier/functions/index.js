@@ -10,6 +10,7 @@ function notifySlack(slackMessage) {
   return rp({
     method: 'POST',
     uri: functions.config().slack.webhook_url,
+    headers: { 'Content-Type': 'application/json' },
     body: {
       slackMessage,
     }
@@ -25,7 +26,7 @@ exports.postOnNewIssue = functions.crashlytics.issue().onNew(async (issue) => {
   const latestAppVersion = issue.appInfo.latestAppVersion;
 
 
-  const messageBody = {
+  const messageBody = JSON.stringify({
     "username": "Firebase Crashlytics", // This will appear as user name who posts the message
     "text": "新しい問題が発生しました",
     "icon_emoji": ":firebase:", // User icon, you can also use custom icons here
@@ -50,7 +51,7 @@ exports.postOnNewIssue = functions.crashlytics.issue().onNew(async (issue) => {
         }
       ]
     }]
-  };
+  });
 
   await notifySlack(messageBody);
   console.log(`Posted new issue ${issueId} successfully to Slack`);
@@ -65,7 +66,7 @@ exports.postOnRegressedIssue = functions.crashlytics.issue().onRegressed(async (
   const latestAppVersion = issue.appInfo.latestAppVersion;
   const resolvedTime = issue.resolvedTime;
 
-  const messageBody = {
+  const messageBody = JSON.stringify({
     "username": "Firebase Crashlytics", // This will appear as user name who posts the message
     "text": `${new Date(resolvedTime).toString()} 以来、再び問題が発生しました`,
     "icon_emoji": ":firebase:", // User icon, you can also use custom icons here
@@ -90,7 +91,7 @@ exports.postOnRegressedIssue = functions.crashlytics.issue().onRegressed(async (
         }
       ]
     }]
-  };
+  });
 
 
   await notifySlack(messageBody);
@@ -105,7 +106,7 @@ exports.postOnVelocityAlert = functions.crashlytics.issue().onVelocityAlert(asyn
   const latestAppVersion = issue.appInfo.latestAppVersion;
   const crashPercentage = issue.velocityAlert.crashPercentage;
 
-  const messageBody = {
+  const messageBody = JSON.stringify({
     "username": "Firebase Crashlytics", // This will appear as user name who posts the message
     "text": `この問題は ${parseFloat(crashPercentage).toFixed(2)} % のユーザーに発生しています`,
     "icon_emoji": ":firebase:", // User icon, you can also use custom icons here
@@ -130,7 +131,7 @@ exports.postOnVelocityAlert = functions.crashlytics.issue().onVelocityAlert(asyn
         }
       ]
     }]
-  };
+  });
 
   await notifySlack(messageBody);
   console.log(`Posted velocity alert ${issueId} successfully to Slack`);
