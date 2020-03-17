@@ -12,8 +12,7 @@ function notifySlack(slackMessage) {
     uri: functions.config().slack.webhook_url,
     body: {
       slackMessage,
-    },
-    json: true,
+    }
   });
 }
 
